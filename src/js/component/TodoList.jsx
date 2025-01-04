@@ -36,21 +36,34 @@ const TodoList = () => {
         button.style.display = 'none';
     };
 
-    const handlerGetList = async () => {
+    const handlerDeleteUser = async () => {
         try {
-            const response = await fetch(`https://playground.4geeks.com/todo/users/${userName}`)
-            if (!response.ok) {
+            const responseDelete = await fetch(`https://playground.4geeks.com/todo/users/${userName}`, { method: 'DELETE' })
+            if (!responseDelete.ok) {
                 throw new Error("No sirvió :(");
             }
-            let data = await response.json();
-            setList(data.todos)
         } catch (error) {
             console.error(error);
 
         };
     };
+
+    const handlerCreateUser = async () => {
+        try {
+            const responseCreate = await fetch(`https://playground.4geeks.com/todo/users/${userName}`, { method: 'POST' })
+            if (!responseCreate.ok) {
+                throw new Error("No sirvió :(");
+            }
+        } catch (error) {
+            console.error(error);
+        };
+    };
     const handlerSearch = async () => {
         try {
+            const responseSearch = await fetch(`https://playground.4geeks.com/todo/users/${userName}`)
+            if (!responseSearch.ok) {
+                throw new Error("No sirvió :(");
+            }
             if (userName.length < 2) {
                 alert("Está muy corto bro")
                 return
@@ -62,13 +75,17 @@ const TodoList = () => {
         }
     };
     useEffect(() => {
-        handlerGetList();
+
     }, [turn])
     return (
-        <div className="d-grid ">
+        <div className="d-grid">
 
             <input type="text" id="usuario" placeholder='Escribe tu usuario acá :)' onChange={(e) => setUserName(e.target.value)} />
-            <button className='boton' onClick={handlerSearch}>Buscar</button>
+            <div className='d-flex'>
+                <button className='boton' onClick={handlerSearch}>Buscar</button>
+                <button className='boton' onClick={handlerCreateUser}>Crear</button>
+                <button className='boton' onClick={handlerDeleteUser}>Borrar user</button>
+            </div>
 
             <input type="text"
                 onChange={(e) => setInputValue(e.target.value)}
