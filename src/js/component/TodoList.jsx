@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HiOutlineXMark } from 'react-icons/hi2';
 
 const TodoList = () => {
 
     const [inputValue, setInputValue] = useState("");
     const [list, setList] = useState([]);
-
-
+    const [userName, setUserName] = useState("sample");
+    const [turn, setTurn] = useState(false)
 
 
     const addTask = (event) => {
@@ -15,7 +15,7 @@ const TodoList = () => {
 
             setList([...list, inputValue]);
 
-            setInputValue(' ');
+            setInputValue('');
 
             return
         };
@@ -36,8 +36,39 @@ const TodoList = () => {
         button.style.display = 'none';
     };
 
+    const handlerGetList = async () => {
+        try {
+            const response = await fetch(`https://playground.4geeks.com/todo/users/${userName}`)
+            if (!response.ok) {
+                throw new Error("No sirvió :(");
+            }
+            let data = await response.json();
+            setList(data.todos)
+        } catch (error) {
+            console.error(error);
+
+        };
+    };
+    const handlerSearch = async () => {
+        try {
+            if (userName.length < 2) {
+                alert("Está muy corto bro")
+                return
+            }
+            setTurn(prev => !prev)
+        } catch (error) {
+            console.error(error);
+
+        }
+    };
+    useEffect(() => {
+        handlerGetList();
+    }, [turn])
     return (
         <div className="d-grid ">
+
+            <input type="text" id="usuario" placeholder='Escribe tu usuario acá :)' onChange={(e) => setUserName(e.target.value)} />
+            <button className='boton' onClick={handlerSearch}>Buscar</button>
 
             <input type="text"
                 onChange={(e) => setInputValue(e.target.value)}
@@ -52,7 +83,7 @@ const TodoList = () => {
                         key={index}
                         onMouseOver={handleMouseOver}
                         onMouseOut={handleMouseOut}
-                        className="list-group-item-success d-flex justify-content-between"> {item}
+                        className="list-group-item-success d-flex justify-content-between"> {item.label}
 
                         <button
                             onClick={() => deleteTask(index)}
