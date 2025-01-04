@@ -5,8 +5,9 @@ const TodoList = () => {
 
     const [inputValue, setInputValue] = useState("");
     const [list, setList] = useState([]);
-    const [userName, setUserName] = useState("sample");
-    const [turn, setTurn] = useState(false)
+    const [userName, setUserName] = useState("sampleUserJS2");
+    const [turn, setTurn] = useState(false);
+    const [identificador, setIdentificador] = useState("");
 
 
     const addTask = (event) => {
@@ -36,6 +37,30 @@ const TodoList = () => {
         button.style.display = 'none';
     };
 
+    const handlerAddTask = async () => {
+        let payload = {
+            label: inputValue,
+            is_done: false
+        };
+        try {
+            const response = await fetch(`https://playground.4geeks.com/todo/todos/${userName}`, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            if (!response.ok) {
+                throw new Error("No sirvió :(");
+            }
+            let data = await response.json();
+            setList([...list, data]);
+        } catch (error) {
+            console.error(error);
+
+        };
+    };
+
     const handlerDeleteUser = async () => {
         try {
             const responseDelete = await fetch(`https://playground.4geeks.com/todo/users/${userName}`, { method: 'DELETE' })
@@ -61,6 +86,7 @@ const TodoList = () => {
     const handlerSearch = async () => {
         try {
             const responseSearch = await fetch(`https://playground.4geeks.com/todo/users/${userName}`)
+            console.log(responseSearch);
             if (!responseSearch.ok) {
                 throw new Error("No sirvió :(");
             }
@@ -75,16 +101,17 @@ const TodoList = () => {
         }
     };
     useEffect(() => {
-
-    }, [turn])
+        fetch("https://playground.4geeks.com/todo/users");
+    }, [])
     return (
         <div className="d-grid">
 
-            <input type="text" id="usuario" placeholder='Escribe tu usuario acá :)' onChange={(e) => setUserName(e.target.value)} />
+            <input type="text" placeholder='Escribe tu usuario acá :)' onChange={(e) => setUserName(e.target.value)} />
             <div className='d-flex'>
                 <button className='boton' onClick={handlerSearch}>Buscar</button>
                 <button className='boton' onClick={handlerCreateUser}>Crear</button>
                 <button className='boton' onClick={handlerDeleteUser}>Borrar user</button>
+                <button className='boton' onClick={handlerAddTask}>Agregar tarea</button>
             </div>
 
             <input type="text"
