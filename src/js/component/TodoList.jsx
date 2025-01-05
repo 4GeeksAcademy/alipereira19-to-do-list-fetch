@@ -5,9 +5,9 @@ const TodoList = () => {
 
     const [inputValue, setInputValue] = useState("");
     const [list, setList] = useState([]);
-    const [userName, setUserName] = useState("sampleUserJS2");
+    const [userName, setUserName] = useState("alip");
     const [turn, setTurn] = useState(false);
-    const [identificador, setIdentificador] = useState("");
+
 
 
     const addTask = (event) => {
@@ -61,6 +61,27 @@ const TodoList = () => {
         };
     };
 
+    const deleteAllTasks = async () => {
+        try {
+            await Promise.all(
+                list.map(async (inputValue) => {
+                    const response = await fetch(`https://playground.4geeks.com/todo/todos/${inputValue.id}`, {
+                        method: "DELETE",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Error al borrar tarea con ID: ${inputValue.id}`);
+                    }
+                })
+            );
+            setList([]);
+        } catch (error) {
+            console.error("Error al borrar todas las tareas:", error);
+        }
+    };
+
     const handlerDeleteUser = async () => {
         try {
             const responseDelete = await fetch(`https://playground.4geeks.com/todo/users/${userName}`, { method: 'DELETE' })
@@ -83,35 +104,48 @@ const TodoList = () => {
             console.error(error);
         };
     };
+
     const handlerSearch = async () => {
         try {
-            const responseSearch = await fetch(`https://playground.4geeks.com/todo/users/${userName}`)
-            console.log(responseSearch);
-            if (!responseSearch.ok) {
-                throw new Error("No sirvió :(");
-            }
             if (userName.length < 2) {
-                alert("Está muy corto bro")
+                alert("Muy corto")
                 return
             }
             setTurn(prev => !prev)
         } catch (error) {
-            console.error(error);
+            console.error(error)
+        };
+    };
 
+    const handlerGetList = async () => {
+
+        try {
+            const response = await fetch(`https://playground.4geeks.com/todo/users/${userName}`)
+            if (!response.ok) {
+                throw new Error(":(");
+            }
+            let data = await response.json();
+            setList(data.todos)
+        } catch (error) {
+            console.error(error)
         }
     };
+
     useEffect(() => {
-        fetch("https://playground.4geeks.com/todo/users");
-    }, [])
+        handlerGetList();
+    }, [turn])
+
     return (
         <div className="d-grid">
 
             <input type="text" placeholder='Escribe tu usuario acá :)' onChange={(e) => setUserName(e.target.value)} />
-            <div className='d-flex'>
-                <button className='boton' onClick={handlerSearch}>Buscar</button>
-                <button className='boton' onClick={handlerCreateUser}>Crear</button>
-                <button className='boton' onClick={handlerDeleteUser}>Borrar user</button>
-                <button className='boton' onClick={handlerAddTask}>Agregar tarea</button>
+            <div className='d-flex container'>
+                <button className='boton' onClick={handlerGetList}>Buscar Tareas</button>
+                <button className='boton' onClick={handlerCreateUser}>Crear Usuario</button>
+                <button className='boton' onClick={handlerDeleteUser}>Borrar Usuario</button>
+                <button className='boton' onClick={handlerAddTask}>Agregar Tarea</button>
+                <button className='boton' onClick={deleteAllTasks}>Borrar Tareas</button>
+
             </div>
 
             <input type="text"

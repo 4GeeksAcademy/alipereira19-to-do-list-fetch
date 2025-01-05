@@ -23,5 +23,10 @@ padding: 5px;
 list-style: none;
 }
 .boton {
-    width: 80px;
+    width: 80px; 
+    margin: 0 -8px 0 8px;
+}
+.container {
+    justify-content: space-between;
+
 }
